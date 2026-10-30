@@ -1,10 +1,14 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { IGridThemeTokens } from '../theme/IGridTheme';
+import { ThemeEngine } from '../theme/ThemeEngine';
 import { ColumnDef, GridSummaryConfig, SelectionStatMetric } from '../types/grid';
 import { SummaryType } from '../types/group';
 import { IGridLocale } from '../i18n/IGridLocale';
+import { LocaleEngine } from '../i18n/LocaleEngine';
 import { MaterialIcon } from './MaterialIcon';
 import { GeometryEngine } from '../core/GeometryEngine';
+
+import { useOptionalGridState, useOptionalGridActions } from '../state';
 
 export interface SelectionSummaryStats {
   count: number;
@@ -23,8 +27,8 @@ export interface SummaryFooterProps {
   onUpdateSummaryConfig?: (patch: Partial<GridSummaryConfig>) => void;
   selectionStats?: SelectionSummaryStats | null;
   columns: ColumnDef[];
-  theme: IGridThemeTokens;
-  locale: IGridLocale;
+  theme?: IGridThemeTokens;
+  locale?: IGridLocale;
   totalRowCount: number;
   unfilteredRowCount?: number;
   geometry?: GeometryEngine;
@@ -356,17 +360,31 @@ export const SummaryFooter: React.FC<SummaryFooterProps> = ({
   summaries,
   summaryTypes = {},
   onChangeSummaryType,
-  summaryConfig,
-  onUpdateSummaryConfig,
+  summaryConfig: propSummaryConfig,
+  onUpdateSummaryConfig: propOnUpdateSummaryConfig,
   selectionStats,
   columns,
-  theme,
-  locale,
+  theme: propTheme,
+  locale: propLocale,
   totalRowCount,
   unfilteredRowCount,
   geometry,
   scrollContainerRef,
 }) => {
+  const gridState = useOptionalGridState();
+  const gridActions = useOptionalGridActions();
+
+  const theme = propTheme ?? gridState?.resolvedTheme ?? ThemeEngine.resolve('apple-dark');
+  const locale = propLocale ?? gridState?.currentLocale ?? LocaleEngine.resolve('auto');
+  const summaryConfig = propSummaryConfig ?? gridState?.summaryConfig ?? {
+    visible: true,
+    showTotalCount: true,
+    showSelectionStats: true,
+    showColumnSummaries: true,
+    allowConfiguration: true,
+  };
+  const onUpdateSummaryConfig = propOnUpdateSummaryConfig ?? ((patch: Partial<GridSummaryConfig>) => gridActions?.updateSummaryConfig(patch));
+
   const [showAddSummary, setShowAddSummary] = useState<boolean>(false);
   const summaryScrollRef = useRef<HTMLDivElement>(null);
   const isTR = locale.code.startsWith('tr');

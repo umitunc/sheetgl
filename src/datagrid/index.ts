@@ -106,3 +106,5 @@ export type {
   CellCommitDirection,
   CellEditorComponent,
 } from './editing';
+
+export * from './state';
