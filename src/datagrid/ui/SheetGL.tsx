@@ -602,6 +602,8 @@ export const SheetGL = forwardRef<GridApi, SheetGLProps>((
       if (initialGroups.length > 0) {
         store.setGrouping(initialGroups);
       }
+      setStoreVersion((v) => v + 1);
+      requestRender();
       return;
     }
 
