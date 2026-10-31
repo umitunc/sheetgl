@@ -68,262 +68,262 @@ export const COLUMN_COLOR_PRESET_LIST: Array<{
 export const COLUMN_COLOR_PALETTES: Record<ColumnColorPreset, DualThemePalette> = {
   blue: {
     light: {
-      groupHeaderBg: '#DBEAFE',
+      groupHeaderBg: '#EFF6FF',
       groupHeaderText: '#1E40AF',
-      groupHeaderBorder: '#93C5FD',
-      headerBg: '#EFF6FF',
+      groupHeaderBorder: '#DBEAFE',
+      headerBg: '#F8FAFF',
       headerText: '#1D4ED8',
-      headerAccent: '#2563EB',
-      columnBg: 'rgba(37, 99, 235, 0.045)',
+      headerAccent: '#3B82F6',
+      columnBg: 'rgba(59, 130, 246, 0.015)',
     },
     dark: {
-      groupHeaderBg: 'rgba(30, 64, 175, 0.42)',
+      groupHeaderBg: 'rgba(30, 64, 175, 0.22)',
       groupHeaderText: '#93C5FD',
-      groupHeaderBorder: 'rgba(59, 130, 246, 0.45)',
-      headerBg: 'rgba(30, 58, 138, 0.28)',
+      groupHeaderBorder: 'rgba(59, 130, 246, 0.30)',
+      headerBg: 'rgba(30, 58, 138, 0.14)',
       headerText: '#BFDBFE',
       headerAccent: '#3B82F6',
-      columnBg: 'rgba(59, 130, 246, 0.065)',
+      columnBg: 'rgba(59, 130, 246, 0.03)',
     },
   },
   indigo: {
     light: {
-      groupHeaderBg: '#E0E7FF',
+      groupHeaderBg: '#EEF2FF',
       groupHeaderText: '#3730A3',
-      groupHeaderBorder: '#A5B4FC',
-      headerBg: '#EEF2FF',
+      groupHeaderBorder: '#E0E7FF',
+      headerBg: '#F8F9FF',
       headerText: '#4338CA',
-      headerAccent: '#4F46E5',
-      columnBg: 'rgba(79, 70, 229, 0.045)',
+      headerAccent: '#6366F1',
+      columnBg: 'rgba(99, 102, 241, 0.015)',
     },
     dark: {
-      groupHeaderBg: 'rgba(55, 48, 163, 0.42)',
+      groupHeaderBg: 'rgba(55, 48, 163, 0.22)',
       groupHeaderText: '#A5B4FC',
-      groupHeaderBorder: 'rgba(99, 102, 241, 0.45)',
-      headerBg: 'rgba(49, 46, 129, 0.28)',
+      groupHeaderBorder: 'rgba(99, 102, 241, 0.30)',
+      headerBg: 'rgba(49, 46, 129, 0.14)',
       headerText: '#C7D2FE',
       headerAccent: '#6366F1',
-      columnBg: 'rgba(99, 102, 241, 0.065)',
+      columnBg: 'rgba(99, 102, 241, 0.03)',
     },
   },
   violet: {
     light: {
-      groupHeaderBg: '#EDE9FE',
+      groupHeaderBg: '#F5F3FF',
       groupHeaderText: '#5B21B6',
-      groupHeaderBorder: '#C4B5FD',
-      headerBg: '#F5F3FF',
+      groupHeaderBorder: '#EDE9FE',
+      headerBg: '#FAF9FF',
       headerText: '#6D28D9',
-      headerAccent: '#7C3AED',
-      columnBg: 'rgba(124, 58, 237, 0.045)',
+      headerAccent: '#8B5CF6',
+      columnBg: 'rgba(139, 92, 246, 0.015)',
     },
     dark: {
-      groupHeaderBg: 'rgba(91, 33, 182, 0.42)',
+      groupHeaderBg: 'rgba(91, 33, 182, 0.22)',
       groupHeaderText: '#C4B5FD',
-      groupHeaderBorder: 'rgba(139, 92, 246, 0.45)',
-      headerBg: 'rgba(76, 29, 149, 0.28)',
+      groupHeaderBorder: 'rgba(139, 92, 246, 0.30)',
+      headerBg: 'rgba(76, 29, 149, 0.14)',
       headerText: '#DDD6FE',
       headerAccent: '#8B5CF6',
-      columnBg: 'rgba(139, 92, 246, 0.065)',
+      columnBg: 'rgba(139, 92, 246, 0.03)',
     },
   },
   purple: {
     light: {
-      groupHeaderBg: '#F3E8FF',
+      groupHeaderBg: '#FAF5FF',
       groupHeaderText: '#6B21A8',
-      groupHeaderBorder: '#D8B4FE',
-      headerBg: '#FAF5FF',
+      groupHeaderBorder: '#F3E8FF',
+      headerBg: '#FDFAFF',
       headerText: '#7E22CE',
-      headerAccent: '#9333EA',
-      columnBg: 'rgba(147, 51, 234, 0.045)',
+      headerAccent: '#A855F7',
+      columnBg: 'rgba(168, 85, 247, 0.015)',
     },
     dark: {
-      groupHeaderBg: 'rgba(107, 33, 168, 0.42)',
+      groupHeaderBg: 'rgba(107, 33, 168, 0.22)',
       groupHeaderText: '#D8B4FE',
-      groupHeaderBorder: 'rgba(168, 85, 247, 0.45)',
-      headerBg: 'rgba(88, 28, 135, 0.28)',
+      groupHeaderBorder: 'rgba(168, 85, 247, 0.30)',
+      headerBg: 'rgba(88, 28, 135, 0.14)',
       headerText: '#E9D5FF',
       headerAccent: '#A855F7',
-      columnBg: 'rgba(168, 85, 247, 0.065)',
+      columnBg: 'rgba(168, 85, 247, 0.03)',
     },
   },
   emerald: {
     light: {
-      groupHeaderBg: '#D1FAE5',
+      groupHeaderBg: '#ECFDF5',
       groupHeaderText: '#065F46',
-      groupHeaderBorder: '#6EE7B7',
-      headerBg: '#ECFDF5',
+      groupHeaderBorder: '#D1FAE5',
+      headerBg: '#F6FEF9',
       headerText: '#047857',
       headerAccent: '#10B981',
-      columnBg: 'rgba(16, 185, 129, 0.05)',
+      columnBg: 'rgba(16, 185, 129, 0.015)',
     },
     dark: {
-      groupHeaderBg: 'rgba(6, 95, 70, 0.45)',
+      groupHeaderBg: 'rgba(6, 95, 70, 0.24)',
       groupHeaderText: '#6EE7B7',
-      groupHeaderBorder: 'rgba(16, 185, 129, 0.45)',
-      headerBg: 'rgba(6, 78, 59, 0.30)',
+      groupHeaderBorder: 'rgba(16, 185, 129, 0.30)',
+      headerBg: 'rgba(6, 78, 59, 0.15)',
       headerText: '#A7F3D0',
       headerAccent: '#10B981',
-      columnBg: 'rgba(16, 185, 129, 0.065)',
+      columnBg: 'rgba(16, 185, 129, 0.03)',
     },
   },
   green: {
     light: {
-      groupHeaderBg: '#DCFCE7',
+      groupHeaderBg: '#F0FDF4',
       groupHeaderText: '#166534',
-      groupHeaderBorder: '#86EFAC',
-      headerBg: '#F0FDF4',
+      groupHeaderBorder: '#DCFCE7',
+      headerBg: '#F7FEF9',
       headerText: '#15803D',
       headerAccent: '#22C55E',
-      columnBg: 'rgba(34, 197, 94, 0.05)',
+      columnBg: 'rgba(34, 197, 94, 0.015)',
     },
     dark: {
-      groupHeaderBg: 'rgba(22, 101, 52, 0.45)',
+      groupHeaderBg: 'rgba(22, 101, 52, 0.24)',
       groupHeaderText: '#86EFAC',
-      groupHeaderBorder: 'rgba(34, 197, 94, 0.45)',
-      headerBg: 'rgba(20, 83, 45, 0.30)',
+      groupHeaderBorder: 'rgba(34, 197, 94, 0.30)',
+      headerBg: 'rgba(20, 83, 45, 0.15)',
       headerText: '#BBF7D0',
       headerAccent: '#22C55E',
-      columnBg: 'rgba(34, 197, 94, 0.065)',
+      columnBg: 'rgba(34, 197, 94, 0.03)',
     },
   },
   teal: {
     light: {
-      groupHeaderBg: '#CCFBF1',
+      groupHeaderBg: '#F0FDFA',
       groupHeaderText: '#115E59',
-      groupHeaderBorder: '#5EEAD4',
-      headerBg: '#F0FDFA',
+      groupHeaderBorder: '#CCFBF1',
+      headerBg: '#F7FEFC',
       headerText: '#0F766E',
       headerAccent: '#14B8A6',
-      columnBg: 'rgba(20, 184, 166, 0.05)',
+      columnBg: 'rgba(20, 184, 166, 0.015)',
     },
     dark: {
-      groupHeaderBg: 'rgba(17, 94, 89, 0.45)',
+      groupHeaderBg: 'rgba(17, 94, 89, 0.24)',
       groupHeaderText: '#5EEAD4',
-      groupHeaderBorder: 'rgba(20, 184, 166, 0.45)',
-      headerBg: 'rgba(19, 78, 74, 0.30)',
+      groupHeaderBorder: 'rgba(20, 184, 166, 0.30)',
+      headerBg: 'rgba(19, 78, 74, 0.15)',
       headerText: '#99F6E4',
       headerAccent: '#14B8A6',
-      columnBg: 'rgba(20, 184, 166, 0.065)',
+      columnBg: 'rgba(20, 184, 166, 0.03)',
     },
   },
   cyan: {
     light: {
-      groupHeaderBg: '#CFFAFE',
+      groupHeaderBg: '#ECFEFF',
       groupHeaderText: '#155E75',
-      groupHeaderBorder: '#67E8F9',
-      headerBg: '#ECFEFF',
+      groupHeaderBorder: '#CFFAFE',
+      headerBg: '#F6FEFF',
       headerText: '#0E7490',
       headerAccent: '#06B6D4',
-      columnBg: 'rgba(6, 182, 212, 0.05)',
+      columnBg: 'rgba(6, 182, 212, 0.015)',
     },
     dark: {
-      groupHeaderBg: 'rgba(21, 94, 117, 0.45)',
+      groupHeaderBg: 'rgba(21, 94, 117, 0.24)',
       groupHeaderText: '#67E8F9',
-      groupHeaderBorder: 'rgba(6, 182, 212, 0.45)',
-      headerBg: 'rgba(22, 78, 99, 0.30)',
+      groupHeaderBorder: 'rgba(6, 182, 212, 0.30)',
+      headerBg: 'rgba(22, 78, 99, 0.15)',
       headerText: '#A5F3FC',
       headerAccent: '#06B6D4',
-      columnBg: 'rgba(6, 182, 212, 0.065)',
+      columnBg: 'rgba(6, 182, 212, 0.03)',
     },
   },
   amber: {
     light: {
-      groupHeaderBg: '#FEF3C7',
+      groupHeaderBg: '#FFFBEB',
       groupHeaderText: '#92400E',
-      groupHeaderBorder: '#FCD34D',
-      headerBg: '#FFFBEB',
+      groupHeaderBorder: '#FEF3C7',
+      headerBg: '#FFFDF5',
       headerText: '#B45309',
       headerAccent: '#F59E0B',
-      columnBg: 'rgba(245, 158, 11, 0.055)',
+      columnBg: 'rgba(245, 158, 11, 0.015)',
     },
     dark: {
-      groupHeaderBg: 'rgba(146, 64, 14, 0.42)',
+      groupHeaderBg: 'rgba(146, 64, 14, 0.22)',
       groupHeaderText: '#FCD34D',
-      groupHeaderBorder: 'rgba(245, 158, 11, 0.45)',
-      headerBg: 'rgba(120, 53, 15, 0.28)',
+      groupHeaderBorder: 'rgba(245, 158, 11, 0.30)',
+      headerBg: 'rgba(120, 53, 15, 0.14)',
       headerText: '#FDE68A',
       headerAccent: '#F59E0B',
-      columnBg: 'rgba(245, 158, 11, 0.065)',
+      columnBg: 'rgba(245, 158, 11, 0.03)',
     },
   },
   orange: {
     light: {
-      groupHeaderBg: '#FFEDD5',
+      groupHeaderBg: '#FFF7ED',
       groupHeaderText: '#9A3412',
-      groupHeaderBorder: '#FDBA74',
-      headerBg: '#FFF7ED',
+      groupHeaderBorder: '#FFEDD5',
+      headerBg: '#FFFAF5',
       headerText: '#C2410C',
       headerAccent: '#F97316',
-      columnBg: 'rgba(249, 115, 22, 0.05)',
+      columnBg: 'rgba(249, 115, 22, 0.015)',
     },
     dark: {
-      groupHeaderBg: 'rgba(154, 52, 18, 0.42)',
+      groupHeaderBg: 'rgba(154, 52, 18, 0.22)',
       groupHeaderText: '#FDBA74',
-      groupHeaderBorder: 'rgba(249, 115, 22, 0.45)',
-      headerBg: 'rgba(124, 45, 18, 0.28)',
+      groupHeaderBorder: 'rgba(249, 115, 22, 0.30)',
+      headerBg: 'rgba(124, 45, 18, 0.14)',
       headerText: '#FED7AA',
       headerAccent: '#F97316',
-      columnBg: 'rgba(249, 115, 22, 0.065)',
+      columnBg: 'rgba(249, 115, 22, 0.03)',
     },
   },
   rose: {
     light: {
-      groupHeaderBg: '#FFE4E6',
+      groupHeaderBg: '#FFF1F2',
       groupHeaderText: '#9F1239',
-      groupHeaderBorder: '#FDA4AF',
-      headerBg: '#FFF1F2',
+      groupHeaderBorder: '#FFE4E6',
+      headerBg: '#FFF8F9',
       headerText: '#BE123C',
       headerAccent: '#F43F5E',
-      columnBg: 'rgba(244, 63, 94, 0.045)',
+      columnBg: 'rgba(244, 63, 94, 0.015)',
     },
     dark: {
-      groupHeaderBg: 'rgba(159, 18, 57, 0.42)',
+      groupHeaderBg: 'rgba(159, 18, 57, 0.22)',
       groupHeaderText: '#FDA4AF',
-      groupHeaderBorder: 'rgba(244, 63, 94, 0.45)',
-      headerBg: 'rgba(136, 19, 55, 0.28)',
+      groupHeaderBorder: 'rgba(244, 63, 94, 0.30)',
+      headerBg: 'rgba(136, 19, 55, 0.14)',
       headerText: '#FECDD3',
       headerAccent: '#F43F5E',
-      columnBg: 'rgba(244, 63, 94, 0.065)',
+      columnBg: 'rgba(244, 63, 94, 0.03)',
     },
   },
   red: {
     light: {
-      groupHeaderBg: '#FEE2E2',
+      groupHeaderBg: '#FEF2F2',
       groupHeaderText: '#991B1B',
-      groupHeaderBorder: '#FCA5A5',
-      headerBg: '#FEF2F2',
+      groupHeaderBorder: '#FEE2E2',
+      headerBg: '#FFF8F8',
       headerText: '#B91C1C',
       headerAccent: '#EF4444',
-      columnBg: 'rgba(239, 68, 68, 0.045)',
+      columnBg: 'rgba(239, 68, 68, 0.015)',
     },
     dark: {
-      groupHeaderBg: 'rgba(153, 27, 27, 0.42)',
+      groupHeaderBg: 'rgba(153, 27, 27, 0.22)',
       groupHeaderText: '#FCA5A5',
-      groupHeaderBorder: 'rgba(239, 68, 68, 0.45)',
-      headerBg: 'rgba(127, 29, 29, 0.28)',
+      groupHeaderBorder: 'rgba(239, 68, 68, 0.30)',
+      headerBg: 'rgba(127, 29, 29, 0.14)',
       headerText: '#FECACA',
       headerAccent: '#EF4444',
-      columnBg: 'rgba(239, 68, 68, 0.065)',
+      columnBg: 'rgba(239, 68, 68, 0.03)',
     },
   },
   slate: {
     light: {
-      groupHeaderBg: '#E2E8F0',
+      groupHeaderBg: '#F8FAFC',
       groupHeaderText: '#1E293B',
-      groupHeaderBorder: '#94A3B8',
-      headerBg: '#F1F5F9',
+      groupHeaderBorder: '#E2E8F0',
+      headerBg: '#FBFDFF',
       headerText: '#334155',
       headerAccent: '#64748B',
-      columnBg: 'rgba(100, 116, 139, 0.045)',
+      columnBg: 'rgba(100, 116, 139, 0.015)',
     },
     dark: {
-      groupHeaderBg: 'rgba(51, 65, 85, 0.55)',
+      groupHeaderBg: 'rgba(51, 65, 85, 0.28)',
       groupHeaderText: '#CBD5E1',
-      groupHeaderBorder: 'rgba(148, 163, 184, 0.35)',
-      headerBg: 'rgba(30, 41, 59, 0.42)',
+      groupHeaderBorder: 'rgba(148, 163, 184, 0.25)',
+      headerBg: 'rgba(30, 41, 59, 0.20)',
       headerText: '#E2E8F0',
       headerAccent: '#94A3B8',
-      columnBg: 'rgba(148, 163, 184, 0.05)',
+      columnBg: 'rgba(148, 163, 184, 0.025)',
     },
   },
 };
@@ -398,25 +398,39 @@ export class ColumnColorEngine {
     // 3. Single hex color string -> auto-adapt for Dark / Light surface roles if used as background shorthand
     const rgb = parseHexRgb(str);
     if (rgb) {
+      // Lift dark hex colors (e.g. #1e3a8a, #065f46, #7c2d12) to bright vibrant hues before mixing with white
+      const maxC = Math.max(rgb.r, rgb.g, rgb.b, 1);
+      const scale = maxC < 215 ? 215 / maxC : 1;
+      const liftedR = Math.min(255, Math.round(rgb.r * scale));
+      const liftedG = Math.min(255, Math.round(rgb.g * scale));
+      const liftedB = Math.min(255, Math.round(rgb.b * scale));
+
+      // Blend with pure white in light mode so canvas fillRect replaces dark/grey base headerBg with a bright, airy pastel
+      const mixWhite = (alpha: number) => {
+        const r = Math.round(255 * (1 - alpha) + liftedR * alpha);
+        const g = Math.round(255 * (1 - alpha) + liftedG * alpha);
+        const b = Math.round(255 * (1 - alpha) + liftedB * alpha);
+        return `rgb(${r}, ${g}, ${b})`;
+      };
       if (role === 'groupHeaderBg') {
         return isDark
-          ? `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.34)`
-          : `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.22)`;
+          ? `rgba(${liftedR}, ${liftedG}, ${liftedB}, 0.16)`
+          : mixWhite(0.055);
       }
       if (role === 'headerBg') {
         return isDark
-          ? `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.24)`
-          : `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.14)`;
+          ? `rgba(${liftedR}, ${liftedG}, ${liftedB}, 0.09)`
+          : mixWhite(0.025);
       }
       if (role === 'columnBg') {
         return isDark
-          ? `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.08)`
-          : `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.06)`;
+          ? `rgba(${liftedR}, ${liftedG}, ${liftedB}, 0.02)`
+          : `rgba(${liftedR}, ${liftedG}, ${liftedB}, 0.008)`;
       }
       if (role === 'groupHeaderBorder') {
         return isDark
-          ? `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.48)`
-          : `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.38)`;
+          ? `rgba(${liftedR}, ${liftedG}, ${liftedB}, 0.28)`
+          : mixWhite(0.12);
       }
     }
 
