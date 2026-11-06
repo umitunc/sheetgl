@@ -7,6 +7,10 @@ import { FilterEngine } from '../core/FilterEngine';
 import { normalizeMultiValue } from '../columns/types/MultiSelectColumn/MultiSelectPainter';
 
 
+import { useOptionalGridState } from '../state';
+import { ThemeEngine } from '../theme/ThemeEngine';
+import { LocaleEngine } from '../i18n/LocaleEngine';
+
 export interface FormulaBarProps {
   activeCoords: { row: number; col: number };
   selectionSpan?: { rows: number; cols: number };
@@ -21,7 +25,7 @@ export interface FormulaBarProps {
   onDuplicateRight?: () => void;
   onDuplicateRow?: () => void;
   onOpenSparklineModal?: () => void;
-  theme: IGridThemeTokens;
+  theme?: IGridThemeTokens;
   locale?: IGridLocale;
 }
 
@@ -683,17 +687,29 @@ export const FormulaBar: React.FC<FormulaBarProps> = ({
   column,
   currentValue,
   isEditable = true,
-  canDuplicate = true,
-  buttonDisplayMode = 'icon-text',
+  canDuplicate: propCanDuplicate,
+  buttonDisplayMode: propButtonDisplayMode,
   onCommitValue,
   onCopyValue,
   onDuplicateDown,
   onDuplicateRight: _onDuplicateRight,
   onDuplicateRow,
   onOpenSparklineModal: _onOpenSparklineModal,
-  theme,
-  locale,
+  theme: propTheme,
+  locale: propLocale,
 }) => {
+  const gridState = useOptionalGridState();
+  const theme = propTheme ?? gridState?.resolvedTheme ?? ThemeEngine.resolve('system');
+  const locale = propLocale ?? gridState?.currentLocale ?? LocaleEngine.resolve('auto');
+  const buttonDisplayMode = propButtonDisplayMode ?? (gridState?.toolbarConfig?.buttonDisplayMode || 'icon-text');
+  const canDuplicate = propCanDuplicate ?? (
+    gridState
+      ? gridState.permissions.mode !== 'read' &&
+        gridState.permissions.mode !== 'readonly' &&
+        gridState.permissions.allowDuplicating !== false
+      : true
+  );
+
   const isTR = locale?.code?.startsWith('tr');
   const isSparkline = column?.type === 'sparkline';
   const [copiedFlash, setCopiedFlash] = useState(false);

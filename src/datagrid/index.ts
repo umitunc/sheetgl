@@ -120,3 +120,5 @@ export type {
   ServerSideStoreOptions,
 } from './types/ssrm';
 export { ServerSideRowStore } from './store/ServerSideRowStore';
+
+export * from './state';
