@@ -124,3 +124,4 @@ export { ServerSideRowStore } from './store/ServerSideRowStore';
 
 export { ColumnManager } from './core/ColumnManager';
 export type { AutoSizeOptions } from './core/ColumnManager';
+export * from './state';

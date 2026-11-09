@@ -2,14 +2,18 @@ import React, { useState } from 'react';
 import { BatchChanges } from '../types/store';
 import { ColumnDef } from '../types/grid';
 import { IGridThemeTokens } from '../theme/IGridTheme';
+import { ThemeEngine } from '../theme/ThemeEngine';
 import { IGridLocale } from '../i18n/IGridLocale';
+import { LocaleEngine } from '../i18n/LocaleEngine';
 import { MaterialIcon } from '../ui/MaterialIcon';
+
+import { useOptionalGridState } from '../state';
 
 export interface BatchChangesModalProps {
   changes: BatchChanges;
   columns: ColumnDef[];
-  theme: IGridThemeTokens;
-  locale: IGridLocale;
+  theme?: IGridThemeTokens;
+  locale?: IGridLocale;
   onConfirmSave: () => void;
   onDiscardAll: () => void;
   onRevertDelete?: (rowKey: any) => void;
@@ -42,8 +46,8 @@ function getRowSummaryLabel(row: Record<string, any> | undefined, key: any): str
 export const BatchChangesModal: React.FC<BatchChangesModalProps> = ({
   changes,
   columns,
-  theme,
-  locale,
+  theme: propTheme,
+  locale: propLocale,
   onConfirmSave,
   onDiscardAll,
   onRevertDelete,
@@ -51,6 +55,9 @@ export const BatchChangesModal: React.FC<BatchChangesModalProps> = ({
   onRevertInsert,
   onClose,
 }) => {
+  const gridState = useOptionalGridState();
+  const theme = propTheme ?? gridState?.resolvedTheme ?? ThemeEngine.resolve('apple-dark');
+  const locale = propLocale ?? gridState?.currentLocale ?? LocaleEngine.resolve('auto');
   const isTR = locale.code.startsWith('tr');
   const inserted = changes.inserted || [];
   const updated = changes.updated || [];

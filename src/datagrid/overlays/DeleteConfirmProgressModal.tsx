@@ -1,14 +1,18 @@
 import React, { useState } from 'react';
 import { IGridThemeTokens } from '../theme/IGridTheme';
+import { ThemeEngine } from '../theme/ThemeEngine';
 import { IGridLocale } from '../i18n/IGridLocale';
+import { LocaleEngine } from '../i18n/LocaleEngine';
 import { MaterialIcon } from '../ui/MaterialIcon';
+
+import { useOptionalGridState } from '../state';
 
 export interface DeleteConfirmProgressModalProps {
   rowKeys: any[];
   sampleRows: Record<string, any>[];
   batchMode: boolean;
-  theme: IGridThemeTokens;
-  locale: IGridLocale;
+  theme?: IGridThemeTokens;
+  locale?: IGridLocale;
   onConfirm: (onProgress: (processed: number, total: number) => void) => Promise<void>;
   onCancel: () => void;
 }
@@ -17,11 +21,14 @@ export const DeleteConfirmProgressModal: React.FC<DeleteConfirmProgressModalProp
   rowKeys,
   sampleRows,
   batchMode,
-  theme,
-  locale,
+  theme: propTheme,
+  locale: propLocale,
   onConfirm,
   onCancel,
 }) => {
+  const gridState = useOptionalGridState();
+  const theme = propTheme ?? gridState?.resolvedTheme ?? ThemeEngine.resolve('apple-dark');
+  const locale = propLocale ?? gridState?.currentLocale ?? LocaleEngine.resolve('auto');
   const isTR = locale.code.startsWith('tr');
   const totalCount = rowKeys.length;
 
