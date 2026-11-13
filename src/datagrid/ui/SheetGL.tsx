@@ -2846,14 +2846,15 @@ export const SheetGL = forwardRef<GridApi, SheetGLProps>((
 
     // Column Custom Cell Click Handler (e.g. inline picker, modal, workflow action)
     if (onCellClick && vRow && vRow.type === 'data') {
+      const screenRect = geom.getColumnScreenRect(hit.col, sl);
       onCellClick({
         rowIndex: hit.row,
         column: colDef,
         row: vRow.data,
         rect: {
-          x: (hit as any).cellX ?? (hit as any).x ?? 0,
+          x: screenRect.x,
           y: geom.headerHeight + hit.row * geom.rowHeight - st,
-          width: colDef.width ?? 120,
+          width: screenRect.width,
           height: geom.rowHeight,
         },
       });
