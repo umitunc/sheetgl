@@ -145,6 +145,13 @@ export interface SheetGLProps {
   onSaved?: (e: SavedEvent) => void;
   /** Callback fired when a data row is double-clicked (useful for lookup modals / selection) */
   onRowDoubleClick?: (row: any, rowIndex: number) => void;
+  /** Callback fired when a data cell is clicked (single click) */
+  onCellClick?: (e: {
+    rowIndex: number;
+    column: ColumnDef;
+    row: Record<string, any>;
+    rect: { x: number; y: number; width: number; height: number };
+  }) => void;
   onAddNewRow?: () => void;
   onCloneRow?: (rowIndex: number, rowData: Record<string, any>) => void | Promise<void>;
   onViewRowDetail?: (rowIndex: number, rowData: Record<string, any>) => void;
@@ -254,6 +261,7 @@ export const SheetGL = forwardRef<GridApi, SheetGLProps>((
     onSaving,
     onSaved,
     onRowDoubleClick,
+    onCellClick,
     onAddNewRow,
     onCloneRow,
     onViewRowDetail,
@@ -2837,6 +2845,19 @@ export const SheetGL = forwardRef<GridApi, SheetGLProps>((
     }
 
     // Column Custom Cell Click Handler (e.g. inline picker, modal, workflow action)
+    if (onCellClick && vRow && vRow.type === 'data') {
+      onCellClick({
+        rowIndex: hit.row,
+        column: colDef,
+        row: vRow.data,
+        rect: {
+          x: (hit as any).cellX ?? (hit as any).x ?? 0,
+          y: geom.headerHeight + hit.row * geom.rowHeight - st,
+          width: colDef.width ?? 120,
+          height: geom.rowHeight,
+        },
+      });
+    }
     if (colDef.onCellClick && vRow && vRow.type === 'data') {
       setIsDraggingSelection(false);
       setFillDragState(null);
