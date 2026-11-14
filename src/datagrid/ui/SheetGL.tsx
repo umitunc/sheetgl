@@ -2554,7 +2554,11 @@ export const SheetGL = forwardRef<GridApi, SheetGLProps>((
       const hasPluginEditor = Boolean(plugin?.editorComponent);
       const cTypeLower = (colDef.type || '').toLowerCase();
       const isSpecialInteractive =
-        cTypeLower === 'action' || cTypeLower === 'dropdownbutton' || cTypeLower === 'pdf';
+        cTypeLower === 'action' ||
+        cTypeLower === 'dropdownbutton' ||
+        cTypeLower === 'pdf' ||
+        cTypeLower === 'boolean' ||
+        cTypeLower === 'switch';
       if (isSpecialInteractive && !hasCustomEditor && !hasPluginEditor) return;
 
       const screenRect = geom.getColumnScreenRect(col, scrollPosRef.current.left);

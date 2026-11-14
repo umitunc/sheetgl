@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { ColumnCategory, DocsPortalProps, DocSubItem, getDocThemeColors } from './docs/types';
 import { buildDocSections } from './docs/sectionRegistry';
 import { DocsHeader } from './docs/components/DocsHeader';
@@ -34,6 +34,7 @@ export const DocsPortal: React.FC<DocsPortalProps> = ({
   const [expandedSubItems, setExpandedSubItems] = useState<Record<string, boolean>>({});
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [colCategoryFilter, setColCategoryFilter] = useState<ColumnCategory>('all');
+  const [selectedColumnType, setSelectedColumnType] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState<boolean>(() =>
     typeof window !== 'undefined' ? window.innerWidth < 900 : false
   );
@@ -59,6 +60,18 @@ export const DocsPortal: React.FC<DocsPortalProps> = ({
 
   const colors = useMemo(() => getDocThemeColors(isDark), [isDark]);
 
+  const handleSelectColumnType = useCallback((colType: string | null) => {
+    setSelectedColumnType(colType);
+    if (colType) {
+      setActiveSubId(`col-type-${colType}-overview`);
+      setExpandedSubItems((prev) => ({ ...prev, [`col-type-${colType}`]: true }));
+    } else {
+      setActiveSubId('col-playground');
+    }
+    const mainEl = document.getElementById('docs-main-scroll');
+    if (mainEl) mainEl.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
   const sections = useMemo(
     () =>
       buildDocSections({
@@ -67,8 +80,10 @@ export const DocsPortal: React.FC<DocsPortalProps> = ({
         colors,
         colCategoryFilter,
         onCategoryFilterChange: setColCategoryFilter,
+        selectedColumnType,
+        onSelectColumnType: handleSelectColumnType,
       }),
-    [isDark, isTR, colors, colCategoryFilter]
+    [isDark, isTR, colors, colCategoryFilter, selectedColumnType, handleSelectColumnType]
   );
 
   const visibleSections = useMemo(() => {
@@ -105,6 +120,9 @@ export const DocsPortal: React.FC<DocsPortalProps> = ({
   const handleSelectSection = (id: string) => {
     setActiveSectionId(id);
     setActiveSubId('');
+    if (id === 'columns') {
+      setSelectedColumnType(null);
+    }
     setExpandedSections((prev) => ({ ...prev, [id]: true }));
     setMobileSidebarOpen(false);
     onSectionChange?.(id);
@@ -121,6 +139,7 @@ export const DocsPortal: React.FC<DocsPortalProps> = ({
   };
 
   const handleSelectSubItem = (sectionId: string, sub: DocSubItem, parentSubId?: string) => {
+    sub.onSelect?.();
     if (activeSectionId !== sectionId) {
       setActiveSectionId(sectionId);
       onSectionChange?.(sectionId);
@@ -131,7 +150,6 @@ export const DocsPortal: React.FC<DocsPortalProps> = ({
       setExpandedSubItems((prev) => ({ ...prev, [parentSubId]: true }));
     }
     setMobileSidebarOpen(false);
-    sub.onSelect?.();
     setTimeout(() => {
       const targetEl = document.getElementById(sub.id);
       if (targetEl) {
@@ -193,10 +211,10 @@ export const DocsPortal: React.FC<DocsPortalProps> = ({
             flex: 1,
             overflowY: 'auto',
             overflowX: 'hidden',
-            padding: isMobile ? '18px 14px 64px' : '40px 56px 80px',
+            padding: isMobile ? '18px 14px 64px' : '28px 32px 64px',
           }}
         >
-          <div style={{ maxWidth: 980, margin: '0 auto' }}>
+          <div style={{ width: '100%' }}>
             {isMobile && (
               <button
                 type="button"
