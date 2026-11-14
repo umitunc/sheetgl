@@ -180,6 +180,8 @@ export function buildDocSections({
       subItems: [
         { id: 'flt-live', labelTr: 'Canlı Gruplama & Filtre Örneği', labelEn: 'Live Grouping & Filter Demo' },
         { id: 'flt-code', labelTr: 'Gruplama & Summary Footer Kodu', labelEn: 'Grouping & Summary Footer Code' },
+        { id: 'flt-enterprise-grouping', labelTr: 'Çok Seviyeli Kontrollü Gruplama (groupBy)', labelEn: 'Enterprise Controlled Grouping (groupBy)' },
+        { id: 'flt-grouping-engine', labelTr: 'RowGroupingEngine API & Alt Toplamlar', labelEn: 'RowGroupingEngine API & Aggregations' },
       ],
       render: () => <FilteringGroupingSection isDark={isDark} isTR={isTR} colors={colors} />,
     },
