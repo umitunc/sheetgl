@@ -253,6 +253,7 @@ function generateDemoData(count: number = 10000, fillMode: DatasetFillMode = 'po
     const progress = (i * 7) % 101;
     const rating = (i % 5) + 1;
     const isApproved = i % 3 === 0;
+    const isActiveSwitch = i % 2 === 0;
     const tags = isSparse && i % 3 === 1 ? [] : [...tagCombos[i % tagCombos.length]];
     const cutoffTime = isSparse && i % 4 === 1 ? null : cutoffTimes[i % cutoffTimes.length];
     const slug = (company || 'enterprise').toLowerCase().replace(/[^a-z0-9]+/g, '').slice(0, 12);
@@ -307,6 +308,7 @@ function generateDemoData(count: number = 10000, fillMode: DatasetFillMode = 'po
       phone,
       tagColor,
       isApproved,
+      isActiveSwitch,
     });
   }
   return rows;
@@ -716,6 +718,14 @@ export function App() {
         filterable: true,
       },
       {
+        id: 'isActiveSwitch',
+        title: lang === 'tr' ? 'Aktif' : 'Active',
+        type: 'switch',
+        width: 95,
+        sortable: true,
+        filterable: true,
+      },
+      {
         id: 'rating',
         title: lang === 'tr' ? 'Güven Skoru' : 'Trust Score',
         type: 'rating',
@@ -825,6 +835,79 @@ export function App() {
           setSelectedRecordModal(row);
         },
       },
+      {
+        id: 'exportMenu',
+        title: lang === 'tr' ? 'Hızlı İşlemler' : 'Quick Actions',
+        type: 'dropdownbutton',
+        width: 155,
+        buttonIcon: 'tune',
+        buttonText: lang === 'tr' ? 'İşlem Seç' : 'Actions',
+        actionMenuItems: (row) => [
+          {
+            id: 'view',
+            label: lang === 'tr' ? 'Detayları Görüntüle' : 'View Details',
+            icon: 'visibility',
+            onClick: (r) => {
+              setSelectedRecordModal(r);
+              gridRef.current?.showToast(
+                lang === 'tr' ? `${r.company} detayı açıldı` : `Opened details for ${r.company}`,
+                'info'
+              );
+              pushEventLog(`DropdownButton -> View (${r.company})`);
+            },
+          },
+          {
+            id: 'pdf',
+            label: lang === 'tr' ? 'PDF Rapor İndir' : 'Export as PDF',
+            icon: 'download',
+            onClick: (r) => {
+              gridRef.current?.showToast(
+                lang === 'tr' ? `${r.company} PDF raporu hazırlanıyor...` : `Exporting ${r.company} as PDF...`,
+                'success'
+              );
+              pushEventLog(`DropdownButton -> PDF (${r.company})`);
+            },
+          },
+          {
+            id: 'excel',
+            label: lang === 'tr' ? "Excel'e Aktar (XLSX)" : 'Export to Excel (XLSX)',
+            icon: 'table_view',
+            onClick: (r) => {
+              gridRef.current?.showToast(
+                lang === 'tr' ? `${r.company} Excel dosyası indirildi` : `Exported ${r.company} to Excel`,
+                'success'
+              );
+              pushEventLog(`DropdownButton -> Excel (${r.company})`);
+            },
+          },
+          { divider: true },
+          {
+            id: 'copy',
+            label: lang === 'tr' ? 'Hesap Kodunu Kopyala' : 'Copy Account Code',
+            icon: 'content_copy',
+            onClick: (r) => {
+              gridRef.current?.showToast(
+                lang === 'tr' ? `Kopyalandı: ${r.code}` : `Copied: ${r.code}`,
+                'info'
+              );
+              pushEventLog(`DropdownButton -> Copy (${r.code})`);
+            },
+          },
+          {
+            id: 'archive',
+            label: lang === 'tr' ? 'Kaydı Arşivle' : 'Archive Record',
+            icon: 'delete',
+            danger: true,
+            onClick: (r) => {
+              gridRef.current?.showToast(
+                lang === 'tr' ? `${r.company} arşivlendi` : `Archived ${r.company}`,
+                'warning'
+              );
+              pushEventLog(`DropdownButton -> Archive (${r.company})`);
+            },
+          },
+        ],
+      },
     ],
     [lang, pushEventLog]
   );
@@ -880,7 +963,7 @@ export function App() {
       {
         id: 'financials',
         title: isTR ? 'FİNANSAL METRİKLER' : 'FINANCIAL METRICS',
-        columnIds: ['balance', 'taxRate', 'netBalance', 'yoyGrowth', 'isApproved'],
+        columnIds: ['balance', 'taxRate', 'netBalance', 'yoyGrowth', 'isApproved', 'isActiveSwitch'],
         color: gm.financials || 'emerald',
         inheritColumnColors: inherit,
       },
@@ -901,7 +984,7 @@ export function App() {
       {
         id: 'contact',
         title: isTR ? 'İLETİŞİM & AKSİYON' : 'CONTACT & ACTIONS',
-        columnIds: ['email', 'website', 'phone', 'tagColor', 'actions'],
+        columnIds: ['email', 'website', 'phone', 'tagColor', 'actions', 'exportMenu'],
         color: gm.contact || 'cyan',
         inheritColumnColors: inherit,
       },
