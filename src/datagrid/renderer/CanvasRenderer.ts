@@ -591,6 +591,7 @@ export class CanvasRenderer {
             !activeColDef ||
             activeColType === 'sparkline' ||
             activeColType === 'action' ||
+            activeColType === 'dropdownbutton' ||
             activeColType === 'pdf' ||
             this.isColumnReadonly(activeColDef, permissions);
 

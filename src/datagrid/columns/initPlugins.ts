@@ -21,6 +21,7 @@ import { RatingColumnPlugin } from './types/RatingColumn';
 import { ProgressColumnPlugin } from './types/ProgressColumn';
 import { SparklineColumnPlugin } from './types/SparklineColumn';
 import { ActionColumnPlugin } from './types/ActionColumn';
+import { DropdownButtonColumnPlugin } from './types/DropdownButtonColumn';
 import { PdfColumnPlugin } from './types/PdfColumn';
 import { RfiColumnPlugin } from './types/RfiColumn';
 
@@ -51,6 +52,7 @@ export function initDefaultColumnPlugins(): void {
   ColumnTypeRegistry.register(ProgressColumnPlugin);
   ColumnTypeRegistry.register(SparklineColumnPlugin);
   ColumnTypeRegistry.register(ActionColumnPlugin);
+  ColumnTypeRegistry.register(DropdownButtonColumnPlugin);
   ColumnTypeRegistry.register(PdfColumnPlugin);
   ColumnTypeRegistry.register(RfiColumnPlugin);
 

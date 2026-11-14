@@ -3,6 +3,7 @@ import { GridApi } from '../core/GridApi';
 import { useGridSelection } from '../hooks/useGridSelection';
 import { useGridGeometry } from '../hooks/useGridGeometry';
 import {
+  ActionMenuItem,
   ColumnDef,
   ColumnGroupDef,
   ActiveOverlayState,
@@ -1108,6 +1109,64 @@ export const SheetGL = forwardRef<GridApi, SheetGLProps>((
       window.removeEventListener('sheetgl-open-pdf', handleOpenPdfEvent);
     };
   }, [onPdfPreviewClick]);
+  const openDropdownMenuForCell = useCallback(
+    (rowIdx: number, colIdx: number, colDef: ColumnDef, rowData: any): boolean => {
+      const colType = (colDef.type || '').toLowerCase();
+      if (
+        (colType !== 'action' && colType !== 'dropdownbutton') ||
+        (!colDef.actionMenuItems && !(colType === 'dropdownbutton' && colDef.options))
+      ) {
+        return false;
+      }
+
+      const baseItems: ActionMenuItem[] = colDef.actionMenuItems
+        ? typeof colDef.actionMenuItems === 'function'
+          ? colDef.actionMenuItems(rowData, rowIdx)
+          : colDef.actionMenuItems
+        : (colDef.options || []).map((opt) => ({
+            id: opt.value,
+            label: opt.label,
+            icon: opt.icon,
+          }));
+
+      const resolvedItems = baseItems.map((item) =>
+        item.divider
+          ? item
+          : {
+              ...item,
+              onClick: (r: any, idx: number) => {
+                item.onClick?.(r, idx);
+                colDef.onDropdownItemClick?.(item, r, idx);
+                if (item.toast) {
+                  const msg = typeof item.toast === 'function' ? item.toast(r, idx) : item.toast;
+                  if (msg) showToast(msg, item.toastType || 'info');
+                }
+              },
+            }
+      );
+
+      if (!resolvedItems || resolvedItems.length === 0) return false;
+
+      const geom = geometryRef.current;
+      const containerRect = containerRef.current?.getBoundingClientRect();
+      const screenRect = geom.getColumnScreenRect(colIdx, scrollPosRef.current.left);
+      const cellY = geom.headerHeight + rowIdx * geom.rowHeight - scrollPosRef.current.top;
+
+      setActionDropdown({
+        x: (containerRect?.left ?? 0) + screenRect.x,
+        y: (containerRect?.top ?? 0) + cellY,
+        width: screenRect.width,
+        height: geom.rowHeight,
+        align: colDef.actionMenuAlign || (colType === 'dropdownbutton' ? 'left' : 'right'),
+        items: resolvedItems,
+        row: rowData,
+        rowIndex: rowIdx,
+      });
+      return true;
+    },
+    [showToast]
+  );
+
   // ============================================================================
   // PERMISSION & EDITABILITY CHECKER
   // ============================================================================
@@ -1115,7 +1174,7 @@ export const SheetGL = forwardRef<GridApi, SheetGLProps>((
     (row: Record<string, any> | undefined, colDef: ColumnDef | undefined, rowIndex: number = 0, silent: boolean = false): boolean => {
       if (!colDef || !row) return false;
       const cType = (colDef.type || '').toLowerCase();
-      if (cType === 'sparkline' || cType === 'action' || cType === 'pdf') return false;
+      if (cType === 'sparkline' || cType === 'action' || cType === 'dropdownbutton' || cType === 'pdf') return false;
 
       if (
         permissions.mode === 'read' ||
@@ -2060,7 +2119,13 @@ export const SheetGL = forwardRef<GridApi, SheetGLProps>((
   const handleToggleGroupColumn = (colId: string) => {
     if (permissions.allowGrouping === false) return;
     const targetCol = columns.find((c) => c.id === colId);
-    if (targetCol && (targetCol.type === 'sparkline' || targetCol.type === 'action' || targetCol.groupable === false)) {
+    if (
+      targetCol &&
+      (targetCol.type === 'sparkline' ||
+        targetCol.type === 'action' ||
+        targetCol.type === 'dropdownbutton' ||
+        targetCol.groupable === false)
+    ) {
       return;
     }
     setGroups((prevGroups) => {
@@ -2196,7 +2261,7 @@ export const SheetGL = forwardRef<GridApi, SheetGLProps>((
         const startCol = selRange ? selRange.startCol : selectionRef.current.activeCell.col;
         const startColDef = geometryRef.current.columns[startCol];
         const startColType = (startColDef?.type || '').toLowerCase();
-        if (startColType === 'action' || startColType === 'pdf') {
+        if (startColType === 'action' || startColType === 'dropdownbutton' || startColType === 'pdf') {
           setIsDraggingSelection(false);
           return;
         }
@@ -2207,7 +2272,7 @@ export const SheetGL = forwardRef<GridApi, SheetGLProps>((
       } else if (fillDragState) {
         const srcColDef = geometryRef.current.columns[fillDragState.sourceRange.minCol];
         const srcColType = (srcColDef?.type || '').toLowerCase();
-        if (srcColType === 'action' || srcColType === 'pdf') {
+        if (srcColType === 'action' || srcColType === 'dropdownbutton' || srcColType === 'pdf') {
           setFillDragState(null);
           return;
         }
@@ -2487,7 +2552,9 @@ export const SheetGL = forwardRef<GridApi, SheetGLProps>((
       const hasCustomEditor = Boolean(colDef.editor) || CellEditorRegistry.has(colDef.type);
       const plugin = ColumnTypeRegistry.get(colDef.type);
       const hasPluginEditor = Boolean(plugin?.editorComponent);
-      const isSpecialInteractive = colDef.type === 'action' || colDef.type === 'pdf';
+      const cTypeLower = (colDef.type || '').toLowerCase();
+      const isSpecialInteractive =
+        cTypeLower === 'action' || cTypeLower === 'dropdownbutton' || cTypeLower === 'pdf';
       if (isSpecialInteractive && !hasCustomEditor && !hasPluginEditor) return;
 
       const screenRect = geom.getColumnScreenRect(col, scrollPosRef.current.left);
@@ -2584,6 +2651,7 @@ export const SheetGL = forwardRef<GridApi, SheetGLProps>((
       !activeColForHover ||
       hoverColType === 'sparkline' ||
       hoverColType === 'action' ||
+      hoverColType === 'dropdownbutton' ||
       hoverColType === 'pdf' ||
       CanvasRenderer.isColumnReadonly(activeColForHover, permissions);
 
@@ -2611,7 +2679,15 @@ export const SheetGL = forwardRef<GridApi, SheetGLProps>((
       requestRender();
     }
     const hoveredCol = hit ? geom.columns[hit.col] : null;
-    if (hoveredCol && (hoveredCol.onCellClick || hoveredCol.type === 'action' || hoveredCol.type === 'pdf' || hoveredCol.type === 'rfi')) {
+    const hoveredColType = (hoveredCol?.type || '').toLowerCase();
+    if (
+      hoveredCol &&
+      (hoveredCol.onCellClick ||
+        hoveredColType === 'action' ||
+        hoveredColType === 'dropdownbutton' ||
+        hoveredColType === 'pdf' ||
+        hoveredColType === 'rfi')
+    ) {
       setCursorStyle('pointer');
     } else {
       setCursorStyle('cell');
@@ -2769,6 +2845,7 @@ export const SheetGL = forwardRef<GridApi, SheetGLProps>((
       !activeColForDup ||
       dupColType === 'sparkline' ||
       dupColType === 'action' ||
+      dupColType === 'dropdownbutton' ||
       dupColType === 'pdf' ||
       CanvasRenderer.isColumnReadonly(activeColForDup, permissions);
 
@@ -2822,7 +2899,8 @@ export const SheetGL = forwardRef<GridApi, SheetGLProps>((
 
     const colDef = geom.columns[hit.col];
     const colType = (colDef?.type || '').toLowerCase();
-    const isInteractiveCol = colType === 'action' || colType === 'pdf' || colType === 'rfi';
+    const isInteractiveCol =
+      colType === 'action' || colType === 'dropdownbutton' || colType === 'pdf' || colType === 'rfi';
 
     if (e.shiftKey && !isInteractiveCol) {
       selectionRef.current.setRangeEnd(hit.row, hit.col);
@@ -2923,40 +3001,18 @@ export const SheetGL = forwardRef<GridApi, SheetGLProps>((
     }
 
     if (plugin.onPointerDown && vRow && vRow.type === 'data') {
-      // Action, PDF & RFI columns work even in read mode; mutable plugins check canEditCell
-      const isActionOrPdf = colType === 'action' || colType === 'pdf' || colType === 'rfi';
+      // Action, DropdownButton, PDF & RFI columns work even in read mode; mutable plugins check canEditCell
+      const isActionOrPdf =
+        colType === 'action' || colType === 'dropdownbutton' || colType === 'pdf' || colType === 'rfi';
       if (isActionOrPdf || canEditCell(vRow.data, colDef, hit.row, false)) {
-        // If this is an action column with actionMenuItems, open the action dropdown overlay
-        if (colType === 'action' && colDef.actionMenuItems) {
-          const rawItems = typeof colDef.actionMenuItems === 'function'
-            ? colDef.actionMenuItems(vRow.data, hit.row)
-            : colDef.actionMenuItems;
-
-          if (rawItems && rawItems.length > 0) {
-            const containerRect = containerRef.current?.getBoundingClientRect();
-            const screenRect = geom.getColumnScreenRect(hit.col, sl);
-            const cellY = geom.headerHeight + hit.row * geom.rowHeight - st;
-            const clientX = (containerRect?.left ?? 0) + screenRect.x;
-            const clientY = (containerRect?.top ?? 0) + cellY;
-
-            setIsDraggingSelection(false);
-            setFillDragState(null);
-            selectionRef.current.setActiveCell(hit.row, hit.col);
-            setSelectionVersion((v) => v + 1);
-
-            setActionDropdown({
-              x: clientX,
-              y: clientY,
-              width: screenRect.width,
-              height: geom.rowHeight,
-              align: colDef.actionMenuAlign || 'right',
-              items: rawItems,
-              row: vRow.data,
-              rowIndex: hit.row,
-            });
-            requestRender();
-            return;
-          }
+        // If this is an action or dropdownbutton column with menu items/options, open the dropdown overlay
+        if (openDropdownMenuForCell(hit.row, hit.col, colDef, vRow.data)) {
+          setIsDraggingSelection(false);
+          setFillDragState(null);
+          selectionRef.current.setActiveCell(hit.row, hit.col);
+          setSelectionVersion((v) => v + 1);
+          requestRender();
+          return;
         }
 
         let shouldFocusContainer = true;
@@ -3628,8 +3684,13 @@ export const SheetGL = forwardRef<GridApi, SheetGLProps>((
     if (colDef && vRow && vRow.type === 'data' && !e.ctrlKey && !e.metaKey && !e.altKey) {
       const plugin = ColumnTypeRegistry.get(colDef.type);
       if (plugin.onKeyDown) {
-        const isAction = colDef.type === 'action';
+        const keyColType = (colDef.type || '').toLowerCase();
+        const isAction = keyColType === 'action' || keyColType === 'dropdownbutton';
         if (isAction || canEditCell(vRow.data, colDef, row, true)) {
+          if (isAction && (e.key === 'Enter' || e.key === ' ') && openDropdownMenuForCell(row, col, colDef, vRow.data)) {
+            e.preventDefault();
+            return;
+          }
           const handled = plugin.onKeyDown({
             event: e,
             value: vRow.data[colDef.id],

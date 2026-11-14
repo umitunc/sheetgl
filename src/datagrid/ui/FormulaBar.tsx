@@ -975,7 +975,7 @@ export const FormulaBar: React.FC<FormulaBarProps> = ({
         <input
           type="text"
           value={draft}
-          readOnly={!isEditable || isSparkline || column?.type === 'action'}
+          readOnly={!isEditable || isSparkline || column?.type === 'action' || column?.type === 'dropdownbutton'}
           onFocus={(e) => {
             setIsFocused(true);
             if (!isEditable) {
