@@ -1,5 +1,5 @@
-import React, { useMemo, useState, useCallback, useEffect } from 'react';
-import { SheetGL, ColumnDef, ColumnGroupDef, GridEventLogEntry, LocaleEngine, SHEETGL_VERSION } from './datagrid';
+import React, { useMemo, useState, useCallback, useEffect, useRef } from 'react';
+import { SheetGL, ColumnDef, ColumnGroupDef, GridApi, GridEventLogEntry, LocaleEngine, SHEETGL_VERSION } from './datagrid';
 import { DocsPortal } from './DocsPortal';
 import { LandingPage } from './LandingPage';
 import { AppView, RouteState, parseLocationPath, buildRoutePath, syncSeoMeta } from './router';
@@ -321,6 +321,7 @@ export function App() {
   const activeView = route.view;
   const [isDark, setIsDark] = useState<boolean>(true);
   const [lang, setLang] = useState<'tr' | 'en'>(() => LocaleEngine.detectBrowserLocaleCode());
+  const gridRef = useRef<GridApi>(null);
 
   const navigate = useCallback((view: AppView, docSection?: string, docSub?: string) => {
     const nextPath = buildRoutePath(view, docSection, docSub);
@@ -849,11 +850,11 @@ export function App() {
             icon: 'visibility',
             onClick: (r) => {
               setSelectedRecordModal(r);
-              gridRef.current?.showToast(
+              gridRef.current?.showToast?.(
                 lang === 'tr' ? `${r.company} detayı açıldı` : `Opened details for ${r.company}`,
                 'info'
               );
-              pushEventLog(`DropdownButton -> View (${r.company})`);
+              pushEventLog('onDropdownItemClick', `View details (${r.company})`, 'info');
             },
           },
           {
@@ -861,11 +862,11 @@ export function App() {
             label: lang === 'tr' ? 'PDF Rapor İndir' : 'Export as PDF',
             icon: 'download',
             onClick: (r) => {
-              gridRef.current?.showToast(
+              gridRef.current?.showToast?.(
                 lang === 'tr' ? `${r.company} PDF raporu hazırlanıyor...` : `Exporting ${r.company} as PDF...`,
                 'success'
               );
-              pushEventLog(`DropdownButton -> PDF (${r.company})`);
+              pushEventLog('onDropdownItemClick', `Export PDF (${r.company})`, 'success');
             },
           },
           {
@@ -873,11 +874,11 @@ export function App() {
             label: lang === 'tr' ? "Excel'e Aktar (XLSX)" : 'Export to Excel (XLSX)',
             icon: 'table_view',
             onClick: (r) => {
-              gridRef.current?.showToast(
+              gridRef.current?.showToast?.(
                 lang === 'tr' ? `${r.company} Excel dosyası indirildi` : `Exported ${r.company} to Excel`,
                 'success'
               );
-              pushEventLog(`DropdownButton -> Excel (${r.company})`);
+              pushEventLog('onDropdownItemClick', `Export Excel (${r.company})`, 'success');
             },
           },
           { divider: true },
@@ -886,11 +887,11 @@ export function App() {
             label: lang === 'tr' ? 'Hesap Kodunu Kopyala' : 'Copy Account Code',
             icon: 'content_copy',
             onClick: (r) => {
-              gridRef.current?.showToast(
+              gridRef.current?.showToast?.(
                 lang === 'tr' ? `Kopyalandı: ${r.code}` : `Copied: ${r.code}`,
                 'info'
               );
-              pushEventLog(`DropdownButton -> Copy (${r.code})`);
+              pushEventLog('onDropdownItemClick', `Copy code (${r.code})`, 'info');
             },
           },
           {
@@ -899,11 +900,11 @@ export function App() {
             icon: 'delete',
             danger: true,
             onClick: (r) => {
-              gridRef.current?.showToast(
+              gridRef.current?.showToast?.(
                 lang === 'tr' ? `${r.company} arşivlendi` : `Archived ${r.company}`,
                 'warning'
               );
-              pushEventLog(`DropdownButton -> Archive (${r.company})`);
+              pushEventLog('onDropdownItemClick', `Archive record (${r.company})`, 'warning');
             },
           },
         ],
@@ -1245,6 +1246,7 @@ export function App() {
           <>
             <div style={{ flex: 1, height: '100%', overflow: 'hidden' }}>
               <SheetGL
+                ref={gridRef}
                 key={`studio-${wizardState.rowCount}-${wizardState.datasetFillMode}`}
                 dataSource={studioData}
                 columns={activeStudioColumns}
