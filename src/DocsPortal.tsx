@@ -6,11 +6,58 @@ import { DocsSidebar } from './docs/components/DocsSidebar';
 
 export type { DocsPortalProps } from './docs/types';
 
+function parseDocSubPath(
+  sectionId: string,
+  subPath?: string
+): {
+  columnType: string | null;
+  subId: string;
+  expandSubId?: string;
+} {
+  if (!subPath) {
+    return { columnType: null, subId: sectionId === 'columns' ? 'col-playground' : '' };
+  }
+  if (sectionId === 'columns') {
+    if (subPath === 'playground') {
+      return { columnType: null, subId: 'col-playground' };
+    }
+    const [colType, tab] = subPath.split('/');
+    if (colType) {
+      const normalizedTab = tab === 'formatting' ? 'formatting' : 'overview';
+      return {
+        columnType: colType,
+        subId: `col-type-${colType}-${normalizedTab}`,
+        expandSubId: `col-type-${colType}`,
+      };
+    }
+  }
+  return { columnType: null, subId: subPath };
+}
+
+function serializeDocSubPath(sectionId: string, subId: string): string | undefined {
+  if (!subId) return undefined;
+  if (sectionId === 'columns') {
+    if (subId === 'col-playground') return undefined;
+    if (subId.startsWith('col-type-')) {
+      const rest = subId.slice('col-type-'.length);
+      if (rest.endsWith('-overview')) {
+        return `${rest.slice(0, -'-overview'.length)}/overview`;
+      }
+      if (rest.endsWith('-formatting')) {
+        return `${rest.slice(0, -'-formatting'.length)}/formatting`;
+      }
+      return rest;
+    }
+  }
+  return subId;
+}
+
 export const DocsPortal: React.FC<DocsPortalProps> = ({
   isDark,
   lang,
   initialSection,
   initialSectionId,
+  initialSubPath,
   onSectionChange,
   onToggleTheme,
   onToggleLang,
@@ -21,20 +68,23 @@ export const DocsPortal: React.FC<DocsPortalProps> = ({
 }) => {
   const isTR = lang === 'tr';
   const resolvedInitialSection = initialSectionId || initialSection || 'quickstart';
+  const initialParsed = parseDocSubPath(resolvedInitialSection, initialSubPath);
   const handleGoStudio = onOpenStudio || onNavigateStudio || (() => {});
   const handleGoLanding = onOpenLanding || onNavigateLanding || (() => {});
 
   const [activeSectionId, setActiveSectionId] = useState<string>(resolvedInitialSection);
-  const [activeSubId, setActiveSubId] = useState<string>('');
+  const [activeSubId, setActiveSubId] = useState<string>(initialParsed.subId);
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     [resolvedInitialSection]: true,
     columns: true,
     validation: true,
   });
-  const [expandedSubItems, setExpandedSubItems] = useState<Record<string, boolean>>({});
+  const [expandedSubItems, setExpandedSubItems] = useState<Record<string, boolean>>(
+    initialParsed.expandSubId ? { [initialParsed.expandSubId]: true } : {}
+  );
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [colCategoryFilter, setColCategoryFilter] = useState<ColumnCategory>('all');
-  const [selectedColumnType, setSelectedColumnType] = useState<string | null>(null);
+  const [selectedColumnType, setSelectedColumnType] = useState<string | null>(initialParsed.columnType);
   const [isMobile, setIsMobile] = useState<boolean>(() =>
     typeof window !== 'undefined' ? window.innerWidth < 900 : false
   );
@@ -51,26 +101,57 @@ export const DocsPortal: React.FC<DocsPortalProps> = ({
   }, []);
 
   const nextSec = initialSectionId || initialSection;
-  const [prevSecProp, setPrevSecProp] = useState<string | undefined>(nextSec);
-  if (nextSec && nextSec !== prevSecProp) {
-    setPrevSecProp(nextSec);
+  const [prevRouteKey, setPrevRouteKey] = useState<string>(`${nextSec || ''}::${initialSubPath || ''}`);
+  const currentRouteKey = `${nextSec || ''}::${initialSubPath || ''}`;
+  if (nextSec && currentRouteKey !== prevRouteKey) {
+    setPrevRouteKey(currentRouteKey);
+    const parsed = parseDocSubPath(nextSec, initialSubPath);
     setActiveSectionId(nextSec);
+    setSelectedColumnType(parsed.columnType);
+    setActiveSubId(parsed.subId);
     setExpandedSections((prev) => ({ ...prev, [nextSec]: true }));
+    if (parsed.expandSubId) {
+      setExpandedSubItems((prev) => ({ ...prev, [parsed.expandSubId!]: true }));
+    }
   }
+
+  // Scroll to initial sub-item anchor on F5 / deep-link load
+  useEffect(() => {
+    if (!initialSubPath) return;
+    const sec = initialSectionId || initialSection || 'quickstart';
+    const parsed = parseDocSubPath(sec, initialSubPath);
+    if (!parsed.subId) return;
+    const timer = setTimeout(() => {
+      const targetEl = document.getElementById(parsed.subId);
+      if (targetEl) {
+        targetEl.scrollIntoView({ behavior: 'auto', block: 'start' });
+      }
+    }, 80);
+    return () => clearTimeout(timer);
+  }, [initialSectionId, initialSection, initialSubPath]);
 
   const colors = useMemo(() => getDocThemeColors(isDark), [isDark]);
 
-  const handleSelectColumnType = useCallback((colType: string | null) => {
-    setSelectedColumnType(colType);
-    if (colType) {
-      setActiveSubId(`col-type-${colType}-overview`);
-      setExpandedSubItems((prev) => ({ ...prev, [`col-type-${colType}`]: true }));
-    } else {
-      setActiveSubId('col-playground');
-    }
-    const mainEl = document.getElementById('docs-main-scroll');
-    if (mainEl) mainEl.scrollTo({ top: 0, behavior: 'smooth' });
-  }, []);
+  const handleSelectColumnType = useCallback(
+    (colType: string | null, syncUrl: boolean = true) => {
+      setSelectedColumnType(colType);
+      if (colType) {
+        setActiveSubId(`col-type-${colType}-overview`);
+        setExpandedSubItems((prev) => ({ ...prev, [`col-type-${colType}`]: true }));
+        if (syncUrl) {
+          onSectionChange?.('columns', `${colType}/overview`);
+        }
+      } else {
+        setActiveSubId('col-playground');
+        if (syncUrl) {
+          onSectionChange?.('columns', undefined);
+        }
+      }
+      const mainEl = document.getElementById('docs-main-scroll');
+      if (mainEl) mainEl.scrollTo({ top: 0, behavior: 'smooth' });
+    },
+    [onSectionChange]
+  );
 
   const sections = useMemo(
     () =>
@@ -142,13 +223,13 @@ export const DocsPortal: React.FC<DocsPortalProps> = ({
     sub.onSelect?.();
     if (activeSectionId !== sectionId) {
       setActiveSectionId(sectionId);
-      onSectionChange?.(sectionId);
     }
     setActiveSubId(sub.id);
     setExpandedSections((prev) => ({ ...prev, [sectionId]: true }));
     if (parentSubId) {
       setExpandedSubItems((prev) => ({ ...prev, [parentSubId]: true }));
     }
+    onSectionChange?.(sectionId, serializeDocSubPath(sectionId, sub.id));
     setMobileSidebarOpen(false);
     setTimeout(() => {
       const targetEl = document.getElementById(sub.id);

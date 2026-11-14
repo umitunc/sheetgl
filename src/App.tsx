@@ -322,12 +322,12 @@ export function App() {
   const [isDark, setIsDark] = useState<boolean>(true);
   const [lang, setLang] = useState<'tr' | 'en'>(() => LocaleEngine.detectBrowserLocaleCode());
 
-  const navigate = useCallback((view: AppView, docSection?: string) => {
-    const nextPath = buildRoutePath(view, docSection);
+  const navigate = useCallback((view: AppView, docSection?: string, docSub?: string) => {
+    const nextPath = buildRoutePath(view, docSection, docSub);
     if (typeof window !== 'undefined' && window.location.pathname !== nextPath) {
-      window.history.pushState({ view, docSection }, '', nextPath);
+      window.history.pushState({ view, docSection, docSub }, '', nextPath);
     }
-    setRoute({ view, docSection });
+    setRoute({ view, docSection, docSub });
   }, []);
 
   useEffect(() => {
@@ -1454,7 +1454,8 @@ export function App() {
             isDark={isDark}
             lang={lang}
             initialSectionId={route.docSection || 'quickstart'}
-            onSectionChange={(secId) => navigate('docs', secId)}
+            initialSubPath={route.docSub}
+            onSectionChange={(secId, subPath) => navigate('docs', secId, subPath)}
             onOpenStudio={() => navigate('studio')}
             onOpenLanding={() => navigate('landing')}
             onToggleTheme={() => setIsDark((d) => !d)}

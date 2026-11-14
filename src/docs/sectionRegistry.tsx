@@ -20,7 +20,7 @@ export interface BuildDocSectionsParams {
   colCategoryFilter: ColumnCategory;
   onCategoryFilterChange: (cat: ColumnCategory) => void;
   selectedColumnType: string | null;
-  onSelectColumnType: (colType: string | null) => void;
+  onSelectColumnType: (colType: string | null, syncUrl?: boolean) => void;
 }
 
 export function buildDocSections({
@@ -69,7 +69,7 @@ export function buildDocSections({
           labelEn: 'Live Columns Playground',
           onSelect: () => {
             onCategoryFilterChange('all');
-            onSelectColumnType(null);
+            onSelectColumnType(null, false);
           },
         },
         ...COLUMN_GUIDES.map((g) => ({
@@ -78,7 +78,7 @@ export function buildDocSections({
           labelEn: g.type,
           onSelect: () => {
             onCategoryFilterChange('all');
-            onSelectColumnType(g.type);
+            onSelectColumnType(g.type, false);
           },
           children: [
             {
@@ -87,7 +87,7 @@ export function buildDocSections({
               labelEn: 'Overview',
               onSelect: () => {
                 onCategoryFilterChange('all');
-                onSelectColumnType(g.type);
+                onSelectColumnType(g.type, false);
               },
             },
             {
@@ -96,7 +96,7 @@ export function buildDocSections({
               labelEn: 'Formatting',
               onSelect: () => {
                 onCategoryFilterChange('all');
-                onSelectColumnType(g.type);
+                onSelectColumnType(g.type, false);
               },
             },
           ],

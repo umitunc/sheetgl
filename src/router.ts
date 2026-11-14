@@ -3,6 +3,7 @@ export type AppView = 'landing' | 'studio' | 'docs';
 export interface RouteState {
   view: AppView;
   docSection?: string;
+  docSub?: string;
 }
 
 export function parseLocationPath(pathname: string): RouteState {
@@ -18,18 +19,22 @@ export function parseLocationPath(pathname: string): RouteState {
 
   if (clean.startsWith('/documentation/') || clean.startsWith('/docs/')) {
     const parts = clean.split('/').filter(Boolean);
-    return { view: 'docs', docSection: parts[1] || 'quickstart' };
+    const docSection = parts[1] || 'quickstart';
+    const docSub = parts.length > 2 ? parts.slice(2).join('/') : undefined;
+    return { view: 'docs', docSection, docSub };
   }
 
   return { view: 'landing' };
 }
 
-export function buildRoutePath(view: AppView, docSection?: string): string {
+export function buildRoutePath(view: AppView, docSection?: string, docSub?: string): string {
   if (view === 'studio') return '/demo';
   if (view === 'docs') {
-    return docSection && docSection !== 'quickstart'
-      ? `/documentation/${docSection}`
-      : '/documentation';
+    const sec = docSection || 'quickstart';
+    if (docSub) {
+      return `/documentation/${sec}/${docSub}`;
+    }
+    return sec !== 'quickstart' ? `/documentation/${sec}` : '/documentation';
   }
   return '/';
 }
@@ -40,7 +45,7 @@ export function syncSeoMeta(route: RouteState, lang: 'tr' | 'en'): void {
   const isTR = lang === 'tr';
   document.documentElement.lang = isTR ? 'tr' : 'en';
 
-  const path = buildRoutePath(route.view, route.docSection);
+  const path = buildRoutePath(route.view, route.docSection, route.docSub);
   const fullUrl = `https://sheetgl.dev${path === '/' ? '/' : path}`;
 
   let title = '';

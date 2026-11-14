@@ -6,7 +6,8 @@ export interface DocsPortalProps {
   lang: 'tr' | 'en';
   initialSection?: string;
   initialSectionId?: string;
-  onSectionChange?: (sectionId: string) => void;
+  initialSubPath?: string;
+  onSectionChange?: (sectionId: string, subPath?: string) => void;
   onToggleTheme: () => void;
   onToggleLang: () => void;
   onNavigateStudio?: () => void;
