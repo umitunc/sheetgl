@@ -1049,6 +1049,7 @@ export const SheetGL = forwardRef<GridApi, SheetGLProps>((
       moveColumn: handleMoveColumn,
       autoSizeColumn,
       autoSizeAllColumns,
+      showToast,
     }),
     [
       handleSetColumnVisibility,
@@ -1058,6 +1059,7 @@ export const SheetGL = forwardRef<GridApi, SheetGLProps>((
       handleMoveColumn,
       autoSizeColumn,
       autoSizeAllColumns,
+      showToast,
       requestRender,
       selectCell,
       selectRange,
