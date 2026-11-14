@@ -20,6 +20,7 @@ export interface DocSubItem {
   labelTr: string;
   labelEn: string;
   onSelect?: () => void;
+  children?: DocSubItem[];
 }
 
 export interface DocSection {

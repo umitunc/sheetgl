@@ -31,6 +31,7 @@ export const DocsPortal: React.FC<DocsPortalProps> = ({
     columns: true,
     validation: true,
   });
+  const [expandedSubItems, setExpandedSubItems] = useState<Record<string, boolean>>({});
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [colCategoryFilter, setColCategoryFilter] = useState<ColumnCategory>('all');
   const [isMobile, setIsMobile] = useState<boolean>(() =>
@@ -81,7 +82,13 @@ export const DocsPortal: React.FC<DocsPortalProps> = ({
         s.subtitleEn.toLowerCase().includes(q) ||
         s.subItems.some(
           (sub) =>
-            sub.labelTr.toLowerCase().includes(q) || sub.labelEn.toLowerCase().includes(q)
+            sub.labelTr.toLowerCase().includes(q) ||
+            sub.labelEn.toLowerCase().includes(q) ||
+            sub.children?.some(
+              (child) =>
+                child.labelTr.toLowerCase().includes(q) ||
+                child.labelEn.toLowerCase().includes(q)
+            )
         )
     );
   }, [sections, searchQuery]);
@@ -109,13 +116,20 @@ export const DocsPortal: React.FC<DocsPortalProps> = ({
     setExpandedSections((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
-  const handleSelectSubItem = (sectionId: string, sub: DocSubItem) => {
+  const handleToggleExpandSubItem = (subId: string) => {
+    setExpandedSubItems((prev) => ({ ...prev, [subId]: !prev[subId] }));
+  };
+
+  const handleSelectSubItem = (sectionId: string, sub: DocSubItem, parentSubId?: string) => {
     if (activeSectionId !== sectionId) {
       setActiveSectionId(sectionId);
       onSectionChange?.(sectionId);
     }
     setActiveSubId(sub.id);
     setExpandedSections((prev) => ({ ...prev, [sectionId]: true }));
+    if (parentSubId) {
+      setExpandedSubItems((prev) => ({ ...prev, [parentSubId]: true }));
+    }
     setMobileSidebarOpen(false);
     sub.onSelect?.();
     setTimeout(() => {
@@ -159,6 +173,7 @@ export const DocsPortal: React.FC<DocsPortalProps> = ({
           activeSectionId={activeSection.id}
           activeSubId={activeSubId}
           expandedSections={expandedSections}
+          expandedSubItems={expandedSubItems}
           searchQuery={searchQuery}
           isTR={isTR}
           colors={colors}
@@ -168,6 +183,7 @@ export const DocsPortal: React.FC<DocsPortalProps> = ({
           onSearchChange={setSearchQuery}
           onSelectSection={handleSelectSection}
           onToggleExpandSection={handleToggleExpandSection}
+          onToggleExpandSubItem={handleToggleExpandSubItem}
           onSelectSubItem={handleSelectSubItem}
         />
 

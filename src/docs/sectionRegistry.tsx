@@ -67,9 +67,23 @@ export function buildDocSections({
         },
         ...COLUMN_GUIDES.map((g) => ({
           id: `col-type-${g.type}`,
-          labelTr: `${g.type} — ${g.titleTr.split(' (')[0]}`,
-          labelEn: `${g.type} — ${g.titleEn.split(' (')[0]}`,
+          labelTr: g.type,
+          labelEn: g.type,
           onSelect: () => onCategoryFilterChange('all'),
+          children: [
+            {
+              id: `col-type-${g.type}-overview`,
+              labelTr: 'Overview',
+              labelEn: 'Overview',
+              onSelect: () => onCategoryFilterChange('all'),
+            },
+            {
+              id: `col-type-${g.type}-formatting`,
+              labelTr: 'Formatting',
+              labelEn: 'Formatting',
+              onSelect: () => onCategoryFilterChange('all'),
+            },
+          ],
         })),
       ],
       render: () => (
