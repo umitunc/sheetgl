@@ -722,7 +722,7 @@ export const FormulaBar: React.FC<FormulaBarProps> = ({
       (column?.options && column.options.length > 0));
 
   const isDateCol = column?.type === 'date' || column?.type === 'datetime';
-  const isBoolCol = column?.type === 'boolean';
+  const isBoolCol = column?.type === 'boolean' || column?.type === 'switch';
 
   const displayVal = isSparkline
     ? isTR
@@ -776,7 +776,7 @@ export const FormulaBar: React.FC<FormulaBarProps> = ({
     ) {
       const n = parseFloat(draft.replace(/[%$,]/g, (m) => (m === ',' ? '.' : '')));
       parsed = isNaN(n) ? 0 : n;
-    } else if (column.type === 'boolean') {
+    } else if (column.type === 'boolean' || column.type === 'switch') {
       parsed = ['true', '1', 'yes', 'evet', 'doğru'].includes(draft.trim().toLowerCase());
     } else if (column.type === 'date' || column.type === 'datetime') {
       const pd = FilterEngine.parseDateParts(draft);

@@ -1570,7 +1570,7 @@ export const SheetGL = forwardRef<GridApi, SheetGLProps>((
         if (col.id === 'id' || col.id.startsWith('__')) continue;
         if (col.defaultValue !== undefined) {
           defaultRow[col.id] = col.defaultValue;
-        } else if (col.type === 'boolean') {
+        } else if (col.type === 'boolean' || col.type === 'switch') {
           defaultRow[col.id] = false;
         } else if (col.type === 'sparkline') {
           defaultRow[col.id] = [];
@@ -3282,7 +3282,7 @@ export const SheetGL = forwardRef<GridApi, SheetGLProps>((
         const emptyVal =
           colDef.type === 'progress' || colDef.type === 'rating'
             ? 0
-            : colDef.type === 'boolean'
+            : colDef.type === 'boolean' || colDef.type === 'switch'
               ? false
               : '';
         updates.push({

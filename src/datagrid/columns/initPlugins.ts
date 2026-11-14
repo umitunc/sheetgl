@@ -4,6 +4,7 @@ import { NumberColumnPlugin } from './types/NumberColumn';
 import { CurrencyColumnPlugin } from './types/CurrencyColumn';
 import { PercentColumnPlugin } from './types/PercentColumn';
 import { BooleanColumnPlugin } from './types/BooleanColumn';
+import { SwitchColumnPlugin } from './types/SwitchColumn';
 import { SelectColumnPlugin } from './types/SelectColumn';
 import { DropdownColumnPlugin } from './types/DropdownColumn';
 import { MultiSelectColumnPlugin } from './types/MultiSelectColumn';
@@ -33,6 +34,7 @@ export function initDefaultColumnPlugins(): void {
   ColumnTypeRegistry.register(CurrencyColumnPlugin);
   ColumnTypeRegistry.register(PercentColumnPlugin);
   ColumnTypeRegistry.register(BooleanColumnPlugin);
+  ColumnTypeRegistry.register(SwitchColumnPlugin);
   ColumnTypeRegistry.register(SelectColumnPlugin);
   ColumnTypeRegistry.register(DropdownColumnPlugin);
   ColumnTypeRegistry.register(MultiSelectColumnPlugin);

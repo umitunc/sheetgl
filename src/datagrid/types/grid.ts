@@ -11,6 +11,7 @@ export type ColumnType =
   | 'currency'
   | 'percent'
   | 'boolean'
+  | 'switch'
   | 'select'
   | 'dropdown'
   | 'multiselect'
