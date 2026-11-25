@@ -2021,7 +2021,7 @@ export const SheetGL = forwardRef<GridApi, SheetGLProps>((
         const totalView = store.getRowCount();
         for (let r = 0; r < totalView && sampleRows.length < 4; r++) {
           const vr = store.getViewRow(r);
-          if (vr && vr.type === 'data' && selectedRowKeysSet.has(vr.data.id ?? r)) {
+          if (vr && vr.type === 'data' && selectedRowKeysSet.has(resolveStoreRowKey(vr.data, store, r))) {
             sampleRows.push(vr.data);
           }
         }
@@ -3034,7 +3034,7 @@ export const SheetGL = forwardRef<GridApi, SheetGLProps>((
           for (let r = 0; r < rowCount; r++) {
             const vr = store.getViewRow(r);
             if (vr && vr.type === 'data') {
-              const k = vr.data.uuid ?? vr.data.id ?? r;
+              const k = resolveStoreRowKey(vr.data, store, r);
               if (!selectedRowKeysSet.has(k)) {
                 allVisibleSelected = false;
                 break;
@@ -3051,7 +3051,7 @@ export const SheetGL = forwardRef<GridApi, SheetGLProps>((
             for (let r = 0; r < rowCount; r++) {
               const vr = store.getViewRow(r);
               if (vr && vr.type === 'data') {
-                const k = vr.data.uuid ?? vr.data.id ?? r;
+                const k = resolveStoreRowKey(vr.data, store, r);
                 nextKeys.add(k);
                 nextData.push(vr.data);
               }
@@ -3224,7 +3224,7 @@ export const SheetGL = forwardRef<GridApi, SheetGLProps>((
 
     // Single Selection Mode: Clicking anywhere on a data row selects that row
     if (rowSelectionMode === 'single' && vRow && vRow.type === 'data') {
-      const rKey = vRow.data.uuid ?? vRow.data.id ?? hit.row;
+      const rKey = resolveStoreRowKey(vRow.data, store, hit.row);
       setSelectedRowKeysSet(new Set([rKey]));
       if (onSelectionChanged) {
         onSelectionChanged([rKey], [vRow.data]);
@@ -3259,7 +3259,7 @@ export const SheetGL = forwardRef<GridApi, SheetGLProps>((
     // Row Selection Column Click ('__selection__')
     if (colDef.id === '__selection__' && vRow && vRow.type === 'data') {
       setIsDraggingSelection(false);
-      const rKey = vRow.data.uuid ?? vRow.data.id ?? hit.row;
+      const rKey = resolveStoreRowKey(vRow.data, store, hit.row);
       setSelectedRowKeysSet((prev) => {
         const next = new Set(prev);
         if (rowSelectionMode === 'single') {
@@ -3277,7 +3277,7 @@ export const SheetGL = forwardRef<GridApi, SheetGLProps>((
           const rowsData: any[] = [];
           for (let r = 0; r < rowCount; r++) {
             const vr = store.getViewRow(r);
-            if (vr && vr.type === 'data' && next.has(vr.data.uuid ?? vr.data.id ?? r)) {
+            if (vr && vr.type === 'data' && next.has(resolveStoreRowKey(vr.data, store, r))) {
               rowsData.push(vr.data);
             }
           }

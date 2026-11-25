@@ -782,7 +782,11 @@ export class CanvasRenderer {
   ): void {
     const cellVal = typeof rowData[col.id] === 'function' ? undefined : rowData[col.id];
     const isHovered = hoveredCell?.row === rowIndex && hoveredCell?.col === colIdx;
-    const isRowSelectedByCheck = selectedRowKeys?.has(rowKey) ?? false;
+    const isRowSelectedByCheck = Boolean(
+      selectedRowKeys &&
+        (selectedRowKeys.has(rowKey) ||
+          (rowData?.uuid !== undefined && rowData.uuid !== null && rowData.uuid !== '' && selectedRowKeys.has(rowData.uuid)))
+    );
     const isReadonly =
       this.isColumnReadonly(col, permissions) ||
       (col.canEdit ? !col.canEdit(rowData, col) : false);
