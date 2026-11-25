@@ -56,6 +56,24 @@ import { CellEditorRegistry } from '../editing/CellEditorRegistry';
 import { LocaleEngine, LocaleInput, IGridLocale } from '../i18n/LocaleEngine';
 import { RowGroupingEngine, isGroupRow, GroupedRow, GroupAggregation } from '../utils/grouping/RowGroupingEngine';
 
+function resolveStoreRowKey(
+  rowData: Record<string, any> | undefined | null,
+  store: IDataStore,
+  fallbackIndex: number
+): any {
+  if (!rowData) return fallbackIndex;
+  const keyField = (store as any).getKeyField?.() || (store as any).keyField || 'id';
+  const kv = rowData[keyField];
+  if (kv !== undefined && kv !== null && kv !== '') return kv;
+  const iv = rowData.id;
+  if (iv !== undefined && iv !== null && iv !== '') return iv;
+  const lv = rowData.legacy_id;
+  if (lv !== undefined && lv !== null && lv !== '') return lv;
+  const uv = rowData.uuid;
+  if (uv !== undefined && uv !== null && uv !== '') return uv;
+  return fallbackIndex;
+}
+
 export interface SheetGLProps {
   dataSource: any[] | IDataStore;
   columns: ColumnDef[];
@@ -1455,8 +1473,7 @@ export const SheetGL = forwardRef<GridApi, SheetGLProps>((
       }
 
       if (onEditingStart && !silent) {
-        const keyField = (store as any).getKeyField?.() || (store as any).keyField || 'id';
-        const rowKey = row[keyField] ?? row.id ?? row.legacy_id ?? rowIndex;
+        const rowKey = resolveStoreRowKey(row, store, rowIndex);
         const evt: EditingStartEvent = {
           row,
           rowKey,
@@ -1479,7 +1496,7 @@ export const SheetGL = forwardRef<GridApi, SheetGLProps>((
 
       return true;
     },
-    [permissions, onEditingStart, currentLocale, showToast]
+    [store, permissions, onEditingStart, currentLocale, showToast]
   );
 
   // ============================================================================
@@ -1496,8 +1513,7 @@ export const SheetGL = forwardRef<GridApi, SheetGLProps>((
       if (!vRow || vRow.type !== 'data') return false;
 
       const rowData = vRow.data;
-      const keyField = (store as any).getKeyField?.() || (store as any).keyField || 'id';
-      const rowKey = rowData[keyField] ?? rowData.id ?? rowData.legacy_id ?? rowIndex;
+      const rowKey = resolveStoreRowKey(rowData, store, rowIndex);
       const oldValue = rowData[colDef.id];
 
       if (oldValue === newValue) {
@@ -1733,22 +1749,33 @@ export const SheetGL = forwardRef<GridApi, SheetGLProps>((
       let firstErrorMsg: string | null = null;
       let rejectedCount = 0;
 
-      const validationResults = await Promise.all(
-        allowedUpdates.map(async (u) => {
-          const valRes = await ValidationEngine.validateCell(u.newValue, u.rowData, u.colDef, isTR);
-          return { update: u, valRes };
-        })
+      const needsValidation = allowedUpdates.some(
+        (u) =>
+          (u.colDef.validationRules && u.colDef.validationRules.length > 0) ||
+          Boolean(u.colDef.validator) ||
+          (u.colDef.type && u.colDef.type !== 'text')
       );
 
-      for (const { update, valRes } of validationResults) {
-        if (valRes.valid) {
-          validatedUpdates.push(update);
-        } else {
-          rejectedCount++;
-          if (!firstErrorMsg) {
-            firstErrorMsg =
-              valRes.message ||
-              (isTR ? 'Doğrulama kuralına uymayan değer engellendi!' : 'Invalid value blocked by validation rule!');
+      if (!needsValidation) {
+        validatedUpdates.push(...allowedUpdates);
+      } else {
+        const validationResults = await Promise.all(
+          allowedUpdates.map(async (u) => {
+            const valRes = await ValidationEngine.validateCell(u.newValue, u.rowData, u.colDef, isTR);
+            return { update: u, valRes };
+          })
+        );
+
+        for (const { update, valRes } of validationResults) {
+          if (valRes.valid) {
+            validatedUpdates.push(update);
+          } else {
+            rejectedCount++;
+            if (!firstErrorMsg) {
+              firstErrorMsg =
+                valRes.message ||
+                (isTR ? 'Doğrulama kuralına uymayan değer engellendi!' : 'Invalid value blocked by validation rule!');
+            }
           }
         }
       }
@@ -2213,7 +2240,7 @@ export const SheetGL = forwardRef<GridApi, SheetGLProps>((
           if (!colDef) continue;
           updates.push({
             rowIndex: r,
-            rowKey: targetRow.data[keyField] ?? targetRow.data.id ?? r,
+            rowKey: resolveStoreRowKey(targetRow.data, store, r),
             colDef,
             newValue: topRow.data[colDef.id],
           });
@@ -2232,7 +2259,7 @@ export const SheetGL = forwardRef<GridApi, SheetGLProps>((
         if (!colDef) continue;
         updates.push({
           rowIndex: nextR,
-          rowKey: dstRow.data[keyField] ?? dstRow.data.id ?? nextR,
+          rowKey: resolveStoreRowKey(dstRow.data, store, nextR),
           colDef,
           newValue: srcRow.data[colDef.id],
         });
@@ -2272,7 +2299,7 @@ export const SheetGL = forwardRef<GridApi, SheetGLProps>((
             : srcVal;
           updates.push({
             rowIndex: r,
-            rowKey: vRow.data[keyField] ?? vRow.data.id ?? r,
+            rowKey: resolveStoreRowKey(vRow.data, store, r),
             colDef: dstColDef,
             newValue: coercedVal,
           });
@@ -2295,7 +2322,7 @@ export const SheetGL = forwardRef<GridApi, SheetGLProps>((
               : srcVal;
             updates.push({
               rowIndex: r,
-              rowKey: vRow.data[keyField] ?? vRow.data.id ?? r,
+              rowKey: resolveStoreRowKey(vRow.data, store, r),
               colDef: dstColDef,
               newValue: coercedVal,
             });
@@ -2483,7 +2510,10 @@ export const SheetGL = forwardRef<GridApi, SheetGLProps>((
       const targetRow = Math.max(0, Math.min(rowCount - 1, Math.floor(virtualY / geometryRef.current.rowHeight)));
 
       if (isDraggingRowNumbers) {
-        selectionRef.current.setRangeEnd(targetRow, geometryRef.current.columns.length - 1);
+        const endCol = geometryRef.current.columns.length - 1;
+        const sr = selectionRef.current.selectionRange;
+        if (sr && sr.endRow === targetRow && sr.endCol === endCol) return;
+        selectionRef.current.setRangeEnd(targetRow, endCol);
         setSelectionVersion((v) => v + 1);
         requestRender();
         return;
@@ -2507,6 +2537,9 @@ export const SheetGL = forwardRef<GridApi, SheetGLProps>((
           setIsDraggingSelection(false);
           return;
         }
+        if (selRange && selRange.endRow === hit.row && selRange.endCol === hit.col) {
+          return;
+        }
 
         selectionRef.current.setRangeEnd(hit.row, hit.col);
         setSelectionVersion((v) => v + 1);
@@ -2523,6 +2556,16 @@ export const SheetGL = forwardRef<GridApi, SheetGLProps>((
         const maxRow = Math.max(src.maxRow, hit.row);
         const minCol = Math.min(src.minCol, hit.col);
         const maxCol = Math.max(src.maxCol, hit.col);
+
+        const curTarget = fillDragState.targetRange;
+        if (
+          curTarget.minRow === minRow &&
+          curTarget.maxRow === maxRow &&
+          curTarget.minCol === minCol &&
+          curTarget.maxCol === maxCol
+        ) {
+          return;
+        }
 
         setFillDragState((prev) =>
           prev
@@ -2612,7 +2655,7 @@ export const SheetGL = forwardRef<GridApi, SheetGLProps>((
 
               updates.push({
                 rowIndex: r,
-                rowKey: dstRow.data.id ?? r,
+                rowKey: resolveStoreRowKey(dstRow.data, store, r),
                 colDef: dstColDef,
                 newValue: val,
               });
@@ -3607,7 +3650,7 @@ export const SheetGL = forwardRef<GridApi, SheetGLProps>((
               : '';
         updates.push({
           rowIndex: r,
-          rowKey: vRow.data[keyField] ?? vRow.data.id ?? r,
+          rowKey: resolveStoreRowKey(vRow.data, store, r),
           colDef,
           newValue: emptyVal,
         });
@@ -3700,7 +3743,7 @@ export const SheetGL = forwardRef<GridApi, SheetGLProps>((
             }
             updates.push({
               rowIndex: r,
-              rowKey: vRow.data[keyField] ?? vRow.data.id ?? r,
+              rowKey: resolveStoreRowKey(vRow.data, store, r),
               colDef,
               newValue: parsedVal,
             });
@@ -3736,7 +3779,7 @@ export const SheetGL = forwardRef<GridApi, SheetGLProps>((
 
             updates.push({
               rowIndex: targetRow,
-              rowKey: vRow.data[keyField] ?? vRow.data.id ?? targetRow,
+              rowKey: resolveStoreRowKey(vRow.data, store, targetRow),
               colDef,
               newValue: parsedVal,
             });

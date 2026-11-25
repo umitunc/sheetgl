@@ -38,6 +38,18 @@ export interface RenderParams {
   getRowStyle?: (row: Record<string, any>, rowIndex: number) => { backgroundColor?: string; textColor?: string } | undefined;
 }
 
+function resolveCanvasRowKey(rowData: Record<string, any>, keyField: string, fallbackIndex: number): any {
+  const kv = rowData[keyField];
+  if (kv !== undefined && kv !== null && kv !== '') return kv;
+  const uv = rowData.uuid;
+  if (uv !== undefined && uv !== null && uv !== '') return uv;
+  const iv = rowData.id;
+  if (iv !== undefined && iv !== null && iv !== '') return iv;
+  const lv = rowData.legacy_id;
+  if (lv !== undefined && lv !== null && lv !== '') return lv;
+  return fallbackIndex;
+}
+
 export class CanvasRenderer {
   public static isColumnReadonly(col: ColumnDef, permissions?: GridPermissions): boolean {
     if (permissions?.mode === 'read' || permissions?.mode === 'readonly') return true;
@@ -234,6 +246,7 @@ export class CanvasRenderer {
       // ========================================================================
       // 3-PASS DUAL PINNING DATA CELL RENDERING
       // ========================================================================
+      const storeKeyField = (store as any).getKeyField?.() || (store as any).keyField || 'id';
 
       // --- PASS 1 (Center Scrollable) ---
       if (geometry.centerColumns.length > 0 && centerClipWidth > 0) {
@@ -247,7 +260,7 @@ export class CanvasRenderer {
           if (!vRow || vRow.type !== 'data') continue;
 
           const rowData = vRow.data;
-          const rowKey = rowData.id ?? r;
+          const rowKey = resolveCanvasRowKey(rowData, storeKeyField, r);
           const isRowInserted = store.isRowInserted?.(rowKey) ?? false;
           const isRowLoading = loadingRowKeys?.has(rowKey) ?? false;
           const rowY = headerH + r * rowH - scrollTop;
@@ -321,7 +334,7 @@ export class CanvasRenderer {
         if (!vRow || vRow.type !== 'data') continue;
 
         const rowData = vRow.data;
-        const rowKey = rowData.uuid ?? rowData.id ?? r;
+        const rowKey = resolveCanvasRowKey(rowData, storeKeyField, r);
         const isRowInserted = store.isRowInserted?.(rowKey) ?? false;
         const isRowLoading = loadingRowKeys?.has(rowKey) ?? false;
         const isRowInActiveSel = r >= normSel.minRow && r <= normSel.maxRow;
@@ -437,7 +450,7 @@ export class CanvasRenderer {
           if (!vRow || vRow.type !== 'data') continue;
 
           const rowData = vRow.data;
-          const rowKey = rowData.id ?? r;
+          const rowKey = resolveCanvasRowKey(rowData, storeKeyField, r);
           const isRowInserted = store.isRowInserted?.(rowKey) ?? false;
           const isRowLoading = loadingRowKeys?.has(rowKey) ?? false;
           const rowY = headerH + r * rowH - scrollTop;

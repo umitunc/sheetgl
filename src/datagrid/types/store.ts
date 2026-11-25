@@ -120,5 +120,6 @@ export interface IDataStore
   getSummaries(): Record<string, number> | undefined;
   getSummaryTypes?(): Record<string, SummaryType>;
   setSummaryType?(columnId: string, summaryType: SummaryType): void;
+  getKeyField?(): string;
   isRemote(): boolean;
 }

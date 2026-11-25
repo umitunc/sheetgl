@@ -56,6 +56,10 @@ export class LocalDataStore implements IDataStore {
     return false;
   }
 
+  public getKeyField(): string {
+    return this.keyField;
+  }
+
   public setData(data: any[]): void {
     this.rawData = data.map((item, idx) => ({
       ...item,
