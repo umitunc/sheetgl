@@ -112,6 +112,8 @@ export interface SheetGLProps {
   onSelectionModeChange?: (mode: RowSelectionMode) => void;
   selectedRowKeys?: any[];
   onSelectionChanged?: (selectedRowKeys: any[], selectedRowsData: any[]) => void;
+  /** Optional callback when user clicks the Select-All header checkbox to select all rows (e.g. for remote/virtual stores) */
+  onSelectAllRows?: () => void | Promise<void>;
   onPermissionsChange?: (permissions: GridPermissions) => void;
   onCellChange?: (row: any, columnId: string, value: any) => void;
   /** DevExtreme-style remote operations configuration */
@@ -272,6 +274,7 @@ export const SheetGL = forwardRef<GridApi, SheetGLProps>((
     onSelectionModeChange,
     selectedRowKeys: userSelectedRowKeys,
     onSelectionChanged,
+    onSelectAllRows,
     onPermissionsChange,
     onPdfPreviewClick,
     onCellChange,
@@ -3046,6 +3049,8 @@ export const SheetGL = forwardRef<GridApi, SheetGLProps>((
           if (allVisibleSelected || (rowCount > 0 && selectedRowKeysSet.size >= rowCount)) {
             setSelectedRowKeysSet(new Set());
             onSelectionChanged?.([], []);
+          } else if (onSelectAllRows) {
+            void onSelectAllRows();
           } else {
             const nextKeys = new Set<any>();
             const nextData: any[] = [];
