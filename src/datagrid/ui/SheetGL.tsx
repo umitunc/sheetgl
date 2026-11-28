@@ -2554,8 +2554,9 @@ export const SheetGL = forwardRef<GridApi, SheetGLProps>((
         const src = fillDragState.sourceRange;
         const minRow = Math.min(src.minRow, hit.row);
         const maxRow = Math.max(src.maxRow, hit.row);
-        const minCol = Math.min(src.minCol, hit.col);
-        const maxCol = Math.max(src.maxCol, hit.col);
+        // Vertical-only fill/clone: never expand horizontally into adjacent columns
+        const minCol = src.minCol;
+        const maxCol = src.maxCol;
 
         const curTarget = fillDragState.targetRange;
         if (
